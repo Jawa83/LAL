@@ -24,7 +24,6 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
 
 public class GameActivity extends Activity {
 		
@@ -43,20 +42,29 @@ public class GameActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
-		gc = new GameController().withGrid(new Grid().initialize()).withLevel(Level.INTERMEDIATE);
+		// Fetch the 'selected level' from the intent
+		Intent intent = getIntent();
+		int level = intent.getIntExtra(MainActivity.SELECTED_LEVEL, Level.INTERMEDIATE.getLevelValue());
+		this.setTitle(Level.getByValue(level).getLevelText());
+		
+		// Create a new GameController with the correct 'level'
+		gc = new GameController().withGrid(new Grid().initialize()).withLevel(Level.getByValue(level));
 		Grid grid = gc.getGrid();
 		
+		// Programmatically create the grid (playfield) as a table
 		TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
 		TableLayout tableLayout = new TableLayout(this);
 		tableLayout.setLayoutParams(tableParams);
 		tableLayout.setGravity(Gravity.CENTER);		
 
+		// create rows
 		for (int row = 0; row < grid.getRows(); row++) {
 			TableRow tableRow = new TableRow(this);
 			tableRow.setLayoutParams(tableParams);
 			tableRow.setGravity(Gravity.CENTER);
 
+			// create columns
 			for (int column = 0; column < grid.getCols(); column++) {
 				ImageView v = new ImageView(this);			
 				v.setLayoutParams(rowParams);
@@ -94,10 +102,10 @@ public class GameActivity extends Activity {
 				});				
 				
 				tableRow.addView(v);
-			}
+			} // end-row
 			tableLayout.addView(tableRow);
-		}		
-				
+		} // end-column
+		
 		tableLayout.setBackgroundResource(BACKGROUND_IMG_RESOURCE);
 		setContentView(tableLayout);
 		
